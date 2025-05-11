@@ -1,0 +1,82 @@
+SIMULACION DE LA PARTE HADRONICA DEL ZDC
+/-----------------------------------------------
+
+FECHA DE ACTUALIZACION: 4/3/2025
+POR: ALEXS MANUEL GAUTE ALVAREZ
+GMAIL: alexsgaute78@gmail.com
+
+/------------------------------------------------
+
+FECHA DE ACTUALIZACION: 17/1/2025
+POR: ALEXS MANUEL GAUTE ALVAREZ
+GMAIL: alexsgaute78@gmail.com
+
+/------------------------------------------------
+Este ZDC es el de la primera etapa de 6 capas y su geometría con sus dimensiones y materiales
+vienen correctamente definidads en el ZDC_prototype.pdf
+CLASES E IMPLEMENTACION:
+
+1-> geometria.hh geometria.cc
+    
+    ->Se construye el detector definido por 6 Layers donde en cada una de ellas se encuentra la siguiente estructura
+
+    |                           |   |                    -------|     |       |           |
+    |                           |   |                    | SiPM |     | PCB   |   Mylar   |
+    |  <---Absorbente (Cu)--->  |Ref|                    | 3*mm | Ref |  1*mm |  0.3*mm   |
+    |           30*mm           |0.1|                    |      |0.1mm|       |           |   
+    |                           |   |        5*mm        -------|     |       |           |
+    |                           |   |  <------Sci------------>  |     |       |           |
+
+
+    ->Para hacer el SiPM dentro del centellante fabrique un hueco dentro del centellante con una operacion de substraccion
+    del volumen de una caja con las dimensiones de un pixel(una cajita del centellante) ccon las dimensiones de un SiPM
+    y se obtiene el volumen solido del centellante que es una caja con un hueco de las dimensiones del centellante.
+
+    ->El numero de las copias tiene el formato siguiente: LFC-> Las centenas es el numero del Layer
+                                                             -> Las decenas es el numero de las filas
+                                                             -> Las unidades es el numero de las columnas
+    
+    ->En la funcion ConstructSDandField se logran declarar los SD. En este caso el unico que se tiene puesto es el de los centellantes 
+
+2-> generador.hh generador.cc
+
+    Se construye un cañón de partículas (neutrones), donde en la variable de nofparticles (ahora no recuerdo como se llama) se puede cambiar para tener un número de partículas por evento.
+    La idea sobre la que se construye esto es a partir del run.mac que tiene el comando /run/beam On [number of event] para tener una buena estadística.
+
+3-> Clases de los SD:
+    Estan creadas 3 clases Absorber.hh, SiMP.hh y SciSD.hh para poder declarar como sensitive dectors los tres volumenes, pero 
+    solamente estan procesados los hits en la clase del SciSD.hh.
+
+    3.1-> SciSD.hh SciSD.cc
+          
+        ->Esta Clase aun esta en construccion aunque ya se logran guardar la siguiente data en un .root
+           a* Id del Layer del hit
+           b* Id del centellante del hit
+           c* la posicion del hit con respecto al origen de coordenas
+           d* la energia depositada por cada hit
+
+        ->Al final de cada evento se printea la energia depositada, asi como despues de cada hit se imprime la informacion
+        de ese hit con el siguiente formato.
+        ------------ Event 0 ---------------
+        Layer No: 6
+        Copy No: 14
+        Position(10.5166,66.1699,13225.9)
+        Energy deposited 1.91263
+        --------------------------
+
+4-> runAction.hh  runAction.cc
+    
+    -> En esta clase se crea al inicio de cada corrida un archivo .root de salida con el nombre de 
+    output#.root y output#_t#.root que contienen los histogramas y los Tree respectivamente. El simbolo de #
+    esta determinado por el numero del Run
+
+    -> En la funcion EndOfRunAction se escriben los trees y los histogramas creados en el archivo .root
+    e imprime un mensaje de finalizado el Run #
+
+5-> La fisica que se utilizo en el programa se encuentra en el main del programa
+    se incluyo el paquete de la fisica FTFP_BERT, que se usa para algunos ejemplos de detectores de tipo calorimetro en 
+    los examples de G4 puesto que es bastante amplio.
+
+6-> Macros
+    Hasta ahora hay creado solo dos macros uno para visualizacion (vis.mac) y para modificar algunos parametros del run (run.mac),
+    este ultimo se estaba empleando para correr el programa en modo multithreading y se usa el G4MTRunManager en lugar del G4RunManager.
