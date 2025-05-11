@@ -1,0 +1,42 @@
+#/run/numberOfThreads 4
+
+/run/initialize 
+
+/gun/energy 1.0 GeV
+/run/beamOn 100000
+
+/gun/energy 2.0 GeV
+/run/beamOn 100000
+
+/gun/energy 3.0 GeV
+/run/beamOn 100000
+
+/gun/energy 4.0 GeV
+/run/beamOn 100000
+
+/gun/energy 5.0 GeV
+/run/beamOn 100000
+
+/gun/energy 6.0 GeV
+/run/beamOn 100000
+
+/gun/energy 7.0 GeV
+/run/beamOn 100000
+
+/gun/energy 8.0 GeV
+/run/beamOn 100000
+
+/gun/energy 9.0 GeV
+/run/beamOn 100000
+
+/gun/energy 10.0 GeV
+/run/beamOn 100000
+
+/gun/energy 11.0 GeV
+/run/beamOn 100000
+
+/gun/energy 12.0 GeV
+/run/beamOn 100000
+
+
+

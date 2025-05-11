@@ -1,0 +1,84 @@
+#include "leakSD.hh"
+
+leakSD::leakSD(const G4String& nombre, const G4String& NameHistCollection) : G4VSensitiveDetector(nombre)
+{
+    collectionName.insert(NameHistCollection);
+    
+}
+
+leakSD::~leakSD()
+{}
+/*G4double leakSD::ApplyEnergyResolution(G4double edep)
+{
+    return 0.05*edep;
+}*/
+void leakSD::Initialize(G4HCofThisEvent *hce)
+{
+    //Crea la coleccion de hits
+    fHitsCollection=new MyleakHits(SensitiveDetectorName, collectionName[0]);
+
+    //Aniade la coleccion de hits al evento
+    G4int hcID= G4SDManager::GetSDMpointer()->GetCollectionID(collectionName[0]);
+    hce->AddHitsCollection(hcID,fHitsCollection);
+    //fHitsCollection->insert(new SciHit());
+}
+G4bool leakSD::ProcessHits(G4Step *aStep, G4TouchableHistory *hist)
+{
+    G4Track *track = aStep->GetTrack();
+    G4double fEnergyDeposited = track->GetKineticEnergy();
+    G4cout<<fEnergyDeposited/MeV<<" MeV"<<G4endl;
+    track->SetTrackStatus(fStopAndKill);
+
+    const G4VTouchable *touchable = aStep->GetTrack()->GetTouchable();
+    G4VPhysicalVolume *physvol = touchable->GetVolume();
+    G4int copy = touchable->GetCopyNumber();
+    G4int copyNo=copy;
+
+    G4int ID = G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID()+1;
+    
+    leakHit *hit = new leakHit();
+
+    
+    //G4StepPoint *prestepPoint = aStep->GetPreStepPoint();
+   
+    
+    //G4ThreeVector pos = prestepPoint->GetPosition();  
+    
+    //G4double energyRes=ApplyEnergyResolution(fEnergyDeposited);//esta energyRes es la energ\'ia con la resolucion aplicada
+    
+    
+    hit->SetEnergy(fEnergyDeposited);
+    //hit->SetTime(aStep->GetPostStepPoint()->GetGlobalTime());
+    //hit->SetPos(pos);
+    hit->SetCopy(copyNo);
+    hit->SetID(ID);
+    fHitsCollection->insert(hit);
+    /*G4cout<< "Track ID: "<<trackID<<", ParentID: "<<parentId<<", Particle Name: "<<partName<<", Global Time: "<<
+  G4BestUnit(time,"Time")<<", el Layer es:  "<< flayerNo<<" el numero de la copia es: "<<copyNo<<G4endl;*/
+    
+
+    return true;
+}
+void leakSD::EndOfEvent(G4HCofThisEvent *)
+{
+  /* G4int nHits = fHitsCollection->entries();
+     G4AnalysisManager *analysismanager = G4AnalysisManager::Instance();
+   G4cout
+       << G4endl
+       << "-------->Hits Collection: in this event they are " << nHits
+       << G4endl;
+   for (G4int i =0; i<nHits;i++)
+   {
+   (*fHitsCollection)[i]->Print();
+       analysismanager->FillNtupleIColumn(0,(*fHitsCollection)[i]->GetLayer());
+        analysismanager->FillNtupleIColumn(1,(*fHitsCollection)[i]->GetCopy());
+        analysismanager->FillNtupleDColumn(2,(*fHitsCollection)[i]->GetPos().x());
+        analysismanager->FillNtupleDColumn(3,(*fHitsCollection)[i]->GetPos().y());
+        analysismanager->FillNtupleDColumn(4,(*fHitsCollection)[i]->GetPos().z());
+        analysismanager->FillNtupleDColumn(5,(*fHitsCollection)[i]->GetEnergy());
+        //analysismanager->FillNtupleDColumn(6,(*fHitsCollection)[i]->GetTime());
+        analysismanager->AddNtupleRow();
+
+   }*/
+}
+
